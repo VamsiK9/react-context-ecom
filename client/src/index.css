@@ -1,0 +1,16 @@
+/* client/src/index.css */
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* You can add global styles or custom components here */
+/* Example: setting a default font or background color */
+body {
+  @apply bg-gray-50 text-gray-800;
+}
+
+/* Custom utility for the main content area */
+.container-full {
+  @apply max-w-7xl mx-auto p-4;
+}
