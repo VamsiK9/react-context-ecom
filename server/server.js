@@ -4,15 +4,17 @@ const express = require('express');
 const dotenv = require('dotenv');
 // We need the 'path' module to correctly resolve the path to the root .env file
 const path = require('path'); 
+
+
+// --- FIX: Load .env from the project root directory ---
+// Use path.resolve to go up one directory (..) from the server folder
+dotenv.config({ path: path.resolve(__dirname, '..', '.env') }); 
+
 const connectDB = require('./config/db');
 const productRoutes = require('./routes/productRoutes');
 const userRoutes = require('./routes/userRoutes');
 const orderRoutes = require('./routes/orderRoutes'); 
 const { notFound, errorHandler } = require('./middleware/errorMiddleware');
-
-// --- FIX: Load .env from the project root directory ---
-// Use path.resolve to go up one directory (..) from the server folder
-dotenv.config({ path: path.resolve(__dirname, '..', '.env') }); 
 
 // Connect to MongoDB
 connectDB();

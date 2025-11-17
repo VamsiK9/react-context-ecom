@@ -9,17 +9,17 @@ import ProtectedRoute from './components/ProtectedRoute';
 import { AuthContext } from './context/auth/AuthContext';
 
 // Pages
-import HomeScreen from './pages/HomeScreen';
-import LoginScreen from './pages/LoginScreen';
-import RegisterScreen from './pages/RegisterScreen';
-import ProductScreen from './pages/ProductScreen';
-import CartScreen from './pages/CartScreen';
-import WishlistScreen from './pages/WishlistScreen';
-import ShippingScreen from './pages/ShippingScreen';
-import PaymentScreen from './pages/PaymentScreen';
-import PlaceOrderScreen from './pages/PlaceOrderScreen';
-import OrderScreen from './pages/OrderScreen';
-import ProfileScreen from './pages/ProfileScreen'; // ADDED IMPORT
+import HomeScreen from './pages/HomeScreen.jsx';
+import LoginScreen from './pages/LoginScreen.jsx';
+import RegisterScreen from './pages/RegisterScreen.jsx';
+import ProductScreen from './pages/ProductScreen.jsx';
+import CartScreen from './pages/CartScreen.jsx';
+import WishlistScreen from './pages/WishlistScreen.jsx';
+import ShippingScreen from './pages/ShippingScreen.jsx';
+import PaymentScreen from './pages/PaymentScreen.jsx';
+import PlaceOrderScreen from './pages/PlaceOrderScreen.jsx';
+import OrderScreen from './pages/OrderScreen.jsx';
+import ProfileScreen from './pages/ProfileScreen.jsx'; // ADDED IMPORT
 
 function App() {
     // Get userInfo from context

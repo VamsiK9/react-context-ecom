@@ -1,17 +1,11 @@
-// server/controllers/userController.js (CommonJS Syntax)
+// server/controllers/userController.js (CommonJS Syntax - Fixed 'generateToken' declaration)
 
 const asyncHandler = require('express-async-handler');
 const User = require('../models/UserModel');
-const generateToken = require('../utils/generateToken'); // Assuming you have this helper
+// We rely solely on this import from the utils folder:
+const generateToken = require('../utils/generateToken'); 
 
-// Placeholder for generateToken, needed until you provide the utils folder
-// If you don't have this, the controller will crash.
-const generateToken = (id) => {
-    const jwt = require('jsonwebtoken');
-    // Using a 30-day expiration time
-    return jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: '30d' });
-};
-
+// The duplicate placeholder function has been removed from here.
 
 // @desc    Register a new user
 // @route   POST /api/users
@@ -38,7 +32,8 @@ const registerUser = asyncHandler(async (req, res) => {
             name: user.name,
             email: user.email,
             isAdmin: user.isAdmin,
-            token: generateToken(user._id),
+            // Call the imported function
+            token: generateToken(user._id), 
         });
     } else {
         res.status(400);
@@ -61,6 +56,7 @@ const authUser = asyncHandler(async (req, res) => {
             name: user.name,
             email: user.email,
             isAdmin: user.isAdmin,
+            // Call the imported function
             token: generateToken(user._id),
         });
     } else {

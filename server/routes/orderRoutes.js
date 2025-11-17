@@ -1,19 +1,26 @@
-// server/routes/orderRoutes.js (CommonJS Syntax)
-
 const express = require('express');
-const { protect } = require('../middleware/authMiddleware');
-const { addOrderItems, getOrderById, getMyOrders } = require('../controllers/orderController');
-
 const router = express.Router();
+const { 
+    addOrderItems, 
+    getOrderById, 
+    getMyOrders, 
+    updateOrderToPaid // <-- New function imported
+} = require('../controllers/orderController');
 
-// Route for creating a new order (POST)
+// Assuming you have an authentication middleware named 'protect'
+const { protect } = require('../middleware/authMiddleware'); 
+
+// @desc Create new order (POST /api/orders)
 router.route('/').post(protect, addOrderItems);
 
-// Route for getting all orders for the authenticated user (GET)
-// MUST come before the dynamic /:id route
+// @desc Get logged in user orders (GET /api/orders/myorders)
 router.route('/myorders').get(protect, getMyOrders);
 
-// Route for getting a single order by ID (GET)
+// @desc Update order to paid (PUT /api/orders/:id/pay)
+// This is the missing route for payment verification.
+router.route('/:id/pay').put(protect, updateOrderToPaid);
+
+// @desc Get order by ID (GET /api/orders/:id)
 router.route('/:id').get(protect, getOrderById);
 
 module.exports = router;

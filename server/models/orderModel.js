@@ -57,6 +57,17 @@ const orderSchema = mongoose.Schema(
             required: true,
             default: 0.0,
         },
+        // Razorpay Order ID saved when creating order in Razorpay
+        razorpayOrderId: {
+            type: String,
+        },
+        // Store payment verification/result details
+        paymentResult: {
+            id: { type: String },
+            status: { type: String },
+            update_time: { type: Date },
+            email_address: { type: String },
+        },
         // Payment status details
         isPaid: {
             type: Boolean,
