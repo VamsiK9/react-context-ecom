@@ -37,9 +37,7 @@ const OrderScreen = () => {
                 setError(null);
 
                 const response = await fetch(`/api/orders/${orderId}`, {
-                    headers: {
-                        Authorization: `Bearer ${userInfo.token}`,
-                    },
+                    credentials: 'include',
                 });
 
                 const data = await response.json();
@@ -154,7 +152,10 @@ const OrderScreen = () => {
                             {order.orderItems.map((item, index) => (
                                 <div key={index} className="flex items-center justify-between border-b last:border-b-0 pb-2">
                                     <div className="flex items-center">
-                                        <img src={item.image} alt={item.name} className="w-12 h-12 object-cover rounded mr-4" />
+                                        {(() => {
+                                            const src = item.image && item.image.startsWith('/') ? `http://localhost:5000${item.image}` : item.image;
+                                            return <img src={src} alt={item.name} className="w-12 h-12 object-cover rounded mr-4" />;
+                                        })()}
                                         <span className="text-indigo-600 font-medium">
                                             {item.name}
                                         </span>

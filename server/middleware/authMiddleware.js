@@ -32,7 +32,25 @@ const protect = asyncHandler(async (req, res, next) => {
         }
     }
 
+    // If no Authorization header token, try to read from cookies (httpOnly cookie named 'token')
     if (!token) {
+        try {
+            const cookie = req.headers.cookie; // raw cookie string
+            if (cookie) {
+                const match = cookie.split(';').map(c => c.trim()).find(c => c.startsWith('token='));
+                if (match) {
+                    token = match.split('=')[1];
+                }
+            }
+            if (token) {
+                const decoded = jwt.verify(token, process.env.JWT_SECRET);
+                req.user = await User.findById(decoded.id).select('-password');
+                return next();
+            }
+        } catch (error) {
+            console.error('Cookie auth failed', error);
+        }
+
         res.status(401);
         throw new Error('Not authorized, no token');
     }

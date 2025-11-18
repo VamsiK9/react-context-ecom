@@ -78,8 +78,8 @@ const displayRazorpay = (razorpayDetails, userInfo, proshopOrderId, setLoading, 
                 method: 'PUT',
                 headers: { 
                     'Content-Type': 'application/json', 
-                    Authorization: `Bearer ${userInfo.token}`, 
                 },
+                credentials: 'include',
                 body: JSON.stringify({
                     razorpay_order_id: response.razorpay_order_id,
                     razorpay_payment_id: response.razorpay_payment_id,
@@ -204,8 +204,8 @@ const PlaceOrderScreen = () => {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    Authorization: `Bearer ${userInfo.token}`,
                 },
+                credentials: 'include',
                 body: JSON.stringify(orderDetails),
             });
 

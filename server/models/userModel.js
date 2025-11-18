@@ -23,6 +23,34 @@ const userSchema = mongoose.Schema(
             required: true,
             default: false,
         },
+        // Persist cart and wishlist per user so client doesn't need localStorage
+        cartItems: [
+            {
+                name: { type: String },
+                qty: { type: Number },
+                image: { type: String },
+                price: { type: Number },
+                product: { type: mongoose.Schema.Types.ObjectId, ref: 'Product' },
+            },
+        ],
+        wishlistItems: [
+            {
+                name: { type: String },
+                image: { type: String },
+                price: { type: Number },
+                product: { type: mongoose.Schema.Types.ObjectId, ref: 'Product' },
+            },
+        ],
+        shippingAddress: {
+            address: { type: String },
+            city: { type: String },
+            postalCode: { type: String },
+            country: { type: String },
+        },
+        paymentMethod: {
+            type: String,
+            default: 'Razorpay',
+        },
     },
     {
         timestamps: true,

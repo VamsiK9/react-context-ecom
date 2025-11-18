@@ -25,4 +25,71 @@ const getProductById = asyncHandler(async (req, res) => {
     }
 });
 
-module.exports = { getProducts, getProductById };
+/**
+ * @desc    Create a new product
+ * @route   POST /api/products
+ * @access  Private/Admin
+ * * NOTE: The 'protect' middleware attaches the authenticated user to req.user.
+ * The 'admin' middleware ensures only admins/hosts can reach this route.
+ */
+const createProduct = asyncHandler(async (req, res) => {
+    // Destructure required fields from the request body
+    const { 
+        name, 
+        price, 
+        image, 
+        brand, 
+        category, 
+        countInStock, 
+        description 
+    } = req.body;
+
+    // --- Server-Side Validation ---
+    // Mongoose will perform its own validation on save, but explicit checks 
+    // provide clearer error messages for the client.
+    if (!name || !price || !image || !brand || !category || !description || countInStock === undefined) {
+        res.status(400);
+        throw new Error('Please ensure all required fields (name, price, image, brand, category, countInStock, description) are provided.');
+    }
+
+    // Additional numeric validation
+    if (parseFloat(price) <= 0) {
+        res.status(400);
+        throw new Error('Product price must be greater than zero.');
+    }
+    if (parseInt(countInStock, 10) < 0) {
+        res.status(400);
+        throw new Error('Count in stock cannot be negative.');
+    }
+
+    // --- Mongoose Save Logic ---
+    try {
+        const product = await Product.create({
+            // The 'user' field is required by the schema and must be set 
+            // from the authenticated user provided by the 'protect' middleware.
+            user: req.user._id, 
+            name, 
+            price, 
+            image, 
+            brand, 
+            category, 
+            countInStock, 
+            description,
+            
+            // rating, numReviews, and reviews will take their schema defaults (0 and [])
+        });
+    
+        res.status(201).json({ 
+            message: 'Product created successfully', 
+            product 
+        });
+
+    } catch (error) {
+        // Handle Mongoose-specific validation errors gracefully
+        res.status(400);
+        throw new Error(`Invalid data received: ${error.message}`);
+    }
+});
+
+
+module.exports = { getProducts, getProductById, createProduct };

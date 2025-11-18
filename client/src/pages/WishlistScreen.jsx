@@ -42,7 +42,10 @@ const WishlistScreen = () => {
                     {wishlistItems.map((item) => (
                         <div key={item.product} className="flex flex-col p-4 bg-white border rounded-lg shadow-md">
                             <div className="flex items-center mb-4">
-                                <img src={item.image} alt={item.name} className="w-20 h-20 object-cover rounded mr-4" />
+                                {(() => {
+                                    const src = item.image && item.image.startsWith('/') ? `http://localhost:5000${item.image}` : item.image;
+                                    return <img src={src} alt={item.name} className="w-20 h-20 object-cover rounded mr-4" />;
+                                })()}
                                 
                                 <div className="flex-grow">
                                     <Link to={`/product/${item.product}`} className="font-semibold text-lg hover:text-indigo-600">{item.name}</Link>

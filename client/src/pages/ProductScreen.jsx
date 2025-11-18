@@ -57,7 +57,10 @@ const ProductScreen = () => {
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
                     {/* Column 1: Image */}
                     <div className="lg:col-span-1">
-                        <img src={product.image} alt={product.name} className="w-full h-auto rounded-lg shadow-lg object-cover" />
+                        {(() => {
+                            const src = product.image && product.image.startsWith('/') ? `http://localhost:5000${product.image}` : product.image;
+                            return <img src={src} alt={product.name} className="w-full h-auto rounded-lg shadow-lg object-cover" />;
+                        })()}
                     </div>
 
                     {/* Column 2: Details */}

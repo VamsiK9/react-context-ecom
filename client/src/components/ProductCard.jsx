@@ -50,7 +50,10 @@ const ProductCard = ({ product }) => {
     return (
         <div className="bg-white rounded-lg shadow-xl overflow-hidden transform hover:scale-[1.02] transition duration-300 border border-gray-100">
             <Link to={`/product/${product._id}`}>
-                <img src={product.image} alt={product.name} className="w-full h-48 object-cover" />
+                {(() => {
+                    const src = product.image && product.image.startsWith('/') ? `http://localhost:5000${product.image}` : product.image;
+                    return <img src={src} alt={product.name} className="w-full h-48 object-cover" />;
+                })()}
             </Link>
             
             <div className="p-4">

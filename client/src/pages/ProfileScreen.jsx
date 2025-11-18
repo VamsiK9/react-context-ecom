@@ -48,9 +48,7 @@ const ProfileScreen = () => {
             setErrorOrders(null);
             
             const response = await fetch('/api/orders/myorders', {
-                headers: {
-                    Authorization: `Bearer ${userInfo.token}`,
-                },
+                credentials: 'include',
             });
 
             const data = await response.json();

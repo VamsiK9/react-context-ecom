@@ -3,13 +3,9 @@
 import React, { createContext, useReducer, useEffect } from 'react';
 import axios from 'axios';
 
-// 1. Initial State
-const userFromStorage = localStorage.getItem('userInfo') 
-    ? JSON.parse(localStorage.getItem('userInfo')) 
-    : null;
-
+// 1. Initial State (no localStorage for auth; using httpOnly cookie)
 const initialState = {
-    userInfo: userFromStorage,
+    userInfo: null,
     loading: false,
     error: null,
 };
@@ -23,8 +19,6 @@ const authReducer = (state, action) => {
 
         case 'LOGIN_SUCCESS':
         case 'REGISTER_SUCCESS':
-            // Save user to local storage and update state
-            localStorage.setItem('userInfo', JSON.stringify(action.payload));
             return { ...state, loading: false, userInfo: action.payload };
 
         case 'LOGIN_FAIL':
@@ -32,8 +26,6 @@ const authReducer = (state, action) => {
             return { ...state, loading: false, error: action.payload, userInfo: null };
 
         case 'LOGOUT':
-            // Clear local storage and state
-            localStorage.removeItem('userInfo');
             return { ...state, userInfo: null, error: null };
             
         default:
@@ -52,7 +44,12 @@ export const AuthProvider = ({ children }) => {
     const login = async (email, password) => {
         dispatch({ type: 'LOGIN_REQUEST' });
         try {
-            const { data } = await axios.post('/api/users/login', { email, password });
+            // send credentials to server; server sets httpOnly cookie
+            await axios.post('/api/users/login', { email, password }, { withCredentials: true });
+            // fetch profile using cookie
+            const res = await fetch('/api/users/profile', { credentials: 'include' });
+            if (!res.ok) throw new Error('Failed to fetch profile after login');
+            const data = await res.json();
             dispatch({ type: 'LOGIN_SUCCESS', payload: data });
         } catch (error) {
             const message = error.response && error.response.data.message
@@ -66,20 +63,11 @@ export const AuthProvider = ({ children }) => {
     const register = async (name, email, password, isHost) => {
         dispatch({ type: 'REGISTER_REQUEST' });
         try {
-            const config = {
-                headers: { 'Content-Type': 'application/json' },
-            };
-            
-            // Post the new user data including the isHost flag
-            const { data } = await axios.post(
-                '/api/users', 
-                { name, email, password, isHost }, 
-                config
-            );
-            
+            await axios.post('/api/users', { name, email, password, isHost }, { withCredentials: true });
+            const res = await fetch('/api/users/profile', { credentials: 'include' });
+            if (!res.ok) throw new Error('Failed to fetch profile after register');
+            const data = await res.json();
             dispatch({ type: 'REGISTER_SUCCESS', payload: data });
-            // Immediately log in the user after successful registration
-            localStorage.setItem('userInfo', JSON.stringify(data));
         } catch (error) {
             const message = error.response && error.response.data.message
                 ? error.response.data.message
@@ -88,9 +76,31 @@ export const AuthProvider = ({ children }) => {
         }
     };
     // ACTION: Handle User Logout
-    const logout = () => {
+    const logout = async () => {
+        try {
+            await fetch('/api/users/logout', { method: 'POST', credentials: 'include' });
+        } catch (e) {
+            console.warn('Logout request failed', e);
+        }
         dispatch({ type: 'LOGOUT' });
     };
+
+    // On mount, try to load profile using cookie-based auth
+    useEffect(() => {
+        let cancelled = false;
+        const loadProfile = async () => {
+            try {
+                const res = await fetch('/api/users/profile', { credentials: 'include' });
+                if (!res.ok) return;
+                const data = await res.json();
+                if (!cancelled) dispatch({ type: 'LOGIN_SUCCESS', payload: data });
+            } catch (e) {
+                // ignore
+            }
+        };
+        loadProfile();
+        return () => { cancelled = true; };
+    }, []);
 
     return (
         <AuthContext.Provider value={{

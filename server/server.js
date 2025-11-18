@@ -24,6 +24,24 @@ const app = express();
 // Body parser middleware (allows us to accept JSON data in the body)
 app.use(express.json());
 
+// CORS middleware: allow dev frontend (Vite) to access API during development
+app.use((req, res, next) => {
+    // Allow the Vite dev server origin. Change or extend this as needed.
+    res.header('Access-Control-Allow-Origin', 'http://localhost:5173');
+    res.header('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,OPTIONS');
+    res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+    res.header('Access-Control-Allow-Credentials', 'true');
+    // Handle preflight
+    if (req.method === 'OPTIONS') {
+        return res.sendStatus(200);
+    }
+    next();
+});
+
+// Serve static images from server/public/images at the /images route
+// Place product images in `server/public/images` (e.g., server/public/images/mouse.jpg)
+app.use('/images', express.static(path.join(__dirname, 'public', 'images')));
+
 // Basic health check route
 app.get('/', (req, res) => {
     res.send('API is running...');
