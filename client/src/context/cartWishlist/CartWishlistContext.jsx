@@ -22,6 +22,9 @@ const initialState = {
     // --- CHECKOUT DATA ---
     shippingAddress: loadFromStorage('shippingAddress', {}),
     paymentMethod: loadFromStorage('paymentMethod', 'Razorpay'), // Default payment method
+    // --- LOADING & ERROR STATES ---
+    loading: false,
+    error: null,
 };
 
 // Reducer for Cart and Wishlist actions
@@ -52,6 +55,16 @@ const cartWishlistReducer = (state, action) => {
             return {
                 ...state,
                 cartItems: state.cartItems.filter((x) => x.product !== action.payload),
+            };
+
+        case 'CART_UPDATE_QTY':
+            return {
+                ...state,
+                cartItems: state.cartItems.map((x) =>
+                    x.product === action.payload.productId
+                        ? { ...x, qty: action.payload.qty }
+                        : x
+                ),
             };
 
         case 'CART_CLEAR_ITEMS':
@@ -123,6 +136,10 @@ export const CartWishlistProvider = ({ children }) => {
         dispatch({ type: 'CART_REMOVE_ITEM', payload: id });
     };
 
+    const updateCartItemQty = (productId, qty) => {
+        dispatch({ type: 'CART_UPDATE_QTY', payload: { productId, qty } });
+    };
+
     const clearCart = () => { // NEW ACTION CREATOR
         dispatch({ type: 'CART_CLEAR_ITEMS' });
     };
@@ -149,6 +166,7 @@ export const CartWishlistProvider = ({ children }) => {
                 ...state,
                 addToCart,
                 removeFromCart,
+                updateCartItemQty,
                 clearCart, // NEW
                 saveShippingAddress, 
                 savePaymentMethod,
@@ -156,7 +174,7 @@ export const CartWishlistProvider = ({ children }) => {
                 removeFromWishlist,
             }}
         >
-            {children}
+            {children} 
         </CartWishlistContext.Provider>
     );
 };
